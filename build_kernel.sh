@@ -24,11 +24,11 @@ usage() {
 	echo "  -v VERS           Build kernel for RPi version VERS"
 	echo "                    1: ARCH=arm"
 	echo "                       KBUILD_SRC=. KBUILD_OUTPUT=build-rpi1"
-	echo "                       DESTDIR=dest-rpi1 SUFFIX=v6"
+	echo "                       DESTDIR=dest-rpi1 SUFFIX=v6-idein"
 	echo "                       CROSS_COMPILE=/home/idein/x-tools/armv6-rpi-linux-gnueabihf/bin/armv6-rpi-linux-gnueabihf-"
 	echo "                    2: ARCH=arm"
 	echo "                       KBUILD_SRC=. KBUILD_OUTPUT=build-rpi2"
-	echo "                       DESTDIR=dest-rpi2 SUFFIX=v7"
+	echo "                       DESTDIR=dest-rpi2 SUFFIX=v7-idein"
 	echo "                       CROSS_COMPILE=/home/idein/x-tools/armv7-rpi2-linux-gnueabihf/bin/armv7-rpi2-linux-gnueabihf-"
 	echo
 	echo "  -t                Make specific target(s)"
@@ -84,7 +84,7 @@ while [ -n "$1" ]; do
 					KBUILD_SRC=.
 					KBUILD_OUTPUT=build-rpi1
 					DESTDIR=dest-rpi1
-					SUFFIX=v6
+					SUFFIX=v6-idein
 					CROSS_COMPILE=/home/idein/x-tools/armv6-rpi-linux-gnueabihf/bin/armv6-rpi-linux-gnueabihf-
 					;;
 				2)
@@ -92,7 +92,7 @@ while [ -n "$1" ]; do
 					KBUILD_SRC=.
 					KBUILD_OUTPUT=build-rpi2
 					DESTDIR=dest-rpi2
-					SUFFIX=v7
+					SUFFIX=v7-idein
 					CROSS_COMPILE=/home/idein/x-tools/armv7-rpi2-linux-gnueabihf/bin/armv7-rpi2-linux-gnueabihf-
 					;;
 				*)
