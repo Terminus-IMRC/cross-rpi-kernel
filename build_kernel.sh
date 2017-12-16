@@ -4,8 +4,14 @@
 # 'all' implies 'zImage', 'modules' and 'dtbs'.
 TARGETS='all modules_install headers_install dtbs_install'
 
+# Default Docker image
+IMAGE=ysugi/cross-rpi-kernel
+
 usage() {
 	echo "Usage: $0 [OPTION]..."
+	echo
+	echo "  -i IMAGE          Docker image to use"
+	echo "                    Default: $IMAGE"
 	echo
 	echo "  -a ARCH           Set target arch"
 	echo "  -s KBUILD_SRC     Set kernel source directory"
@@ -35,7 +41,7 @@ usage() {
 	echo "  -h                Show this help"
 }
 
-OPTS=$(getopt 'a:s:o:d:c:k:v:t:h' "$@")
+OPTS=$(getopt 'i:a:s:o:d:c:k:v:t:h' "$@")
 if [ "$?" -ne 0 ]; then
 	usage
 	exit 1
@@ -43,6 +49,10 @@ fi
 set -- $OPTS
 while [ -n "$1" ]; do
 	case "$1" in
+		-i)
+			IMAGE="$2"
+			shift 2
+			;;
 		-a)
 			ARCH="$2"
 			shift 2
@@ -153,7 +163,7 @@ for i in KBUILD_SRC KBUILD_OUTPUT DESTDIR; do
 	eval "$i=\$(realpath "$v")"
 done
 
-for i in ARCH KBUILD_SRC KBUILD_OUTPUT DESTDIR CROSS_COMPILE SUFFIX; do
+for i in IMAGE ARCH KBUILD_SRC KBUILD_OUTPUT DESTDIR CROSS_COMPILE SUFFIX TARGETS; do
 	echo "$i=$(eval echo \$$i)"
 done
 
@@ -167,7 +177,7 @@ DOCKER="time -p docker run --rm -it -u $UID:$GID \
 		-v $KBUILD_SRC:/home/idein/src:ro \
 		-v $KBUILD_OUTPUT:/home/idein/build:rw,delegated \
 		-v $DESTDIR:/home/idein/dest:rw,delegated \
-		idein/cross-rpi-kernel"
+		$IMAGE"
 
 for target in $TARGETS; do
 	echo
