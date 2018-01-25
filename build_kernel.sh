@@ -33,6 +33,7 @@ usage() {
 	echo
 	echo "  -t                Make specific target(s)"
 	echo "                    Default: $TARGETS"
+	echo "                    Separate with comma, not space"
 	echo "                    You can load the default configuration with"
 	echo "                    'bcm2835_defconfig' (RPi1) or"
 	echo "                    'bcm2709_defconfig' (RPi2), configure it with"
@@ -104,7 +105,7 @@ while [ -n "$1" ]; do
 			shift 2
 			;;
 		-t)
-			TARGETS="$2"
+			TARGETS=$(echo $2 | tr -s , ' ')
 			shift 2
 			;;
 		-h)
