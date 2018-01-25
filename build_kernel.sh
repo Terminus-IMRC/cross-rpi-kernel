@@ -189,7 +189,7 @@ for target in $TARGETS; do
 		mkdir -p "$KBUILD_OUTPUT/tools/perf/" "$DESTDIR/usr/local/"
 		$DOCKER make install -j "$NPROCS" \
 				$(ifany ARCH) $(ifany CROSS_COMPILE) \
-				-C /home/idein/src/ \
+				-C /home/idein/src/tools/perf/ \
 				O=/home/idein/build/tools/perf/ \
 				DESTDIR=/home/idein/dest/usr/local/
 	else
