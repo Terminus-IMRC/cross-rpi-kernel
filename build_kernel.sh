@@ -183,7 +183,9 @@ DOCKER="time -p docker run --rm -it -u $UID:$GID \
 for target in $TARGETS; do
 	echo
 	echo "** Making target $target **"
-	if [ "$target" == perf ]; then
+	if [ "$target" == tags -o "$target" == cscope ]; then
+		make $(ifany ARCH) -C "$KBUILD_SRC" "$target"
+	elif [ "$target" == perf ]; then
 		mkdir -p "$KBUILD_OUTPUT/tools/perf/" "$DESTDIR/usr/local/"
 		$DOCKER make install -j "$NPROCS" \
 				$(ifany ARCH) $(ifany CROSS_COMPILE) \
