@@ -35,7 +35,7 @@ usage() {
 	echo "                    Default: $TARGETS"
 	echo "                    Separate with comma, not space"
 	echo "                    You can load the default configuration with"
-	echo "                    'bcm2835_defconfig' (RPi1) or"
+	echo "                    'bcmrpi_defconfig' (RPi1) or"
 	echo "                    'bcm2709_defconfig' (RPi2), configure it with"
 	echo "                    'nconfig', and build perf with 'perf'"
 	echo
