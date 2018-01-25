@@ -2,7 +2,7 @@
 
 # Default targets
 # 'all' implies 'zImage', 'modules' and 'dtbs'.
-TARGETS='all modules_install headers_install dtbs_install'
+TARGETS='all perf modules_install headers_install dtbs_install'
 
 # Default Docker image
 IMAGE=ysugi/cross-rpi-kernel
