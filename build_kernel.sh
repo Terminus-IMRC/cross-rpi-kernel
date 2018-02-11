@@ -22,22 +22,27 @@ usage() {
 	echo "                    The output will be kernelSUFFIX.img"
 	echo
 	echo "  -v VERS           Build kernel for RPi version VERS"
-	echo "                    1: ARCH=arm"
-	echo "                       KBUILD_SRC=. KBUILD_OUTPUT=build-rpi1"
-	echo "                       DESTDIR=dest-rpi1 SUFFIX=v6-idein"
-	echo "                       CROSS_COMPILE=/home/idein/x-tools/armv6-rpi-linux-gnueabihf/bin/armv6-rpi-linux-gnueabihf-"
-	echo "                    2: ARCH=arm"
-	echo "                       KBUILD_SRC=. KBUILD_OUTPUT=build-rpi2"
-	echo "                       DESTDIR=dest-rpi2 SUFFIX=v7-idein"
-	echo "                       CROSS_COMPILE=/home/idein/x-tools/armv7-rpi2-linux-gnueabihf/bin/armv7-rpi2-linux-gnueabihf-"
+	echo "                    1:    ARCH=arm"
+	echo "                          KBUILD_SRC=. KBUILD_OUTPUT=build-rpi1"
+	echo "                          DESTDIR=dest-rpi1    SUFFIX=v6-idein"
+	echo "                          CROSS_COMPILE=/home/idein/x-tools/armv6-rpi-linux-gnueabihf/bin/armv6-rpi-linux-gnueabihf-"
+	echo "                    2:    ARCH=arm"
+	echo "                          KBUILD_SRC=. KBUILD_OUTPUT=build-rpi2"
+	echo "                          DESTDIR=dest-rpi2    SUFFIX=v7-idein"
+	echo "                          CROSS_COMPILE=/home/idein/x-tools/armv7-rpi2-linux-gnueabihf/bin/armv7-rpi2-linux-gnueabihf-"
+	echo "                    3-64: ARCH=arm64"
+	echo "                          KBUILD_SRC=. KBUILD_OUTPUT=build-rpi3-64"
+	echo "                          DESTDIR=dest-rpi3-64 SUFFIX=v8-idein"
+	echo "                          CROSS_COMPILE=/home/idein/x-tools/aarch64-rpi3-linux-gnueabihf/bin/aarch64-rpi3-linux-gnueabihf-"
 	echo
 	echo "  -t                Make specific target(s)"
 	echo "                    Default: $TARGETS"
 	echo "                    Separate with comma, not space"
-	echo "                    You can load the default configuration with"
-	echo "                    'bcmrpi_defconfig' (RPi1) or"
-	echo "                    'bcm2709_defconfig' (RPi2), configure it with"
-	echo "                    'nconfig', and build perf with 'perf'"
+	echo "                    You can load the default configuration with:"
+	echo "                      - 'bcmrpi_defconfig':  Raspberry Pi 1"
+	echo "                      - 'bcm2709_defconfig': Raspberry Pi 2"
+	echo "                      - 'bcmrpi3_defconfig': Raspberry Pi 3"
+	echo "                    , configure it with 'nconfig', and build perf with 'perf'"
 	echo
 	echo "  -h                Show this help"
 }
@@ -96,6 +101,14 @@ while [ -n "$1" ]; do
 					SUFFIX=v7-idein
 					CROSS_COMPILE=/home/idein/x-tools/armv7-rpi2-linux-gnueabihf/bin/armv7-rpi2-linux-gnueabihf-
 					;;
+				3-64)
+					ARCH=arm64
+					KBUILD_SRC=.
+					KBUILD_OUTPUT=build-rpi3-64
+					DESTDIR=dest-rpi3-64
+					SUFFIX=v8-idein
+					CROSS_COMPILE=/home/idein/x-tools/aarch64-rpi3-linux-gnueabihf/bin/aarch64-rpi3-linux-gnueabihf-
+					;;
 				*)
 					echo "error: Invalid VERS $2"
 					usage
@@ -138,8 +151,8 @@ ifany() {
 }
 
 
-if [ "$ARCH" != arm ]; then
-	echo "error: This script mainly targets ARCH=arm"
+if [ "$ARCH" != arm -a "$ARCH" != arm64 ]; then
+	echo "error: This script mainly targets ARCH=arm and ARCH=arm64"
 	usage
 	exit 1
 fi
@@ -147,7 +160,7 @@ fi
 set -e
 
 mkdir -p "$KBUILD_OUTPUT/"
-rm -rf "$DESTDIR/"
+echo "$TARGETS" | tr -s ' ' '\n' | egrep -q '^tags|cscope|nconfig$' || rm -rf "$DESTDIR/"
 mkdir -p "$DESTDIR/boot/overlays/" "$DESTDIR/lib/firmware/" "$DESTDIR/usr/"
 
 for i in KBUILD_SRC KBUILD_OUTPUT DESTDIR; do
@@ -205,7 +218,12 @@ done
 if echo $TARGETS | tr -s ' ' '\n' | egrep -q '^(all)|(zImage)$'; then
 	echo
 	echo "** Generating kernel$SUFFIX.img **"
-	$DOCKER /home/idein/src/scripts/mkknlimg \
-			/home/idein/build/arch/arm/boot/zImage \
-			"/home/idein/dest/boot/kernel$SUFFIX.img"
+	if [ "$ARCH" == arm ]; then
+		$DOCKER /home/idein/src/scripts/mkknlimg \
+				"/home/idein/build/arch/$ARCH/boot/zImage" \
+				"/home/idein/dest/boot/kernel$SUFFIX.img"
+	elif [ "$ARCH" == arm64 ]; then
+		cp -v "$KBUILD_OUTPUT/arch/$ARCH/boot/Image" \
+			"$DESTDIR/boot/kernel$SUFFIX.img"
+	fi
 fi
